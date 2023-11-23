@@ -2,6 +2,7 @@
 
 const eventPool = require('./eventPool');
 const startVendorProcess = require('./vendor');
+require('./vendor');
 
 // Log events
 const logEvent = (eventType, payload) => {
@@ -14,4 +15,3 @@ eventPool.on('pickup', payload => logEvent('pickup', payload));
 eventPool.on('in-transit', payload => logEvent('in-transit', payload));
 eventPool.on('delivered', payload => logEvent('delivered', payload));
 
-startVendorProcess('TheVendor');
