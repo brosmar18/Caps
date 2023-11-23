@@ -3,6 +3,7 @@
 const eventPool = require('./eventPool');
 const startVendorProcess = require('./vendor');
 require('./vendor');
+require('./driver')
 
 // Log events
 const logEvent = (eventType, payload) => {

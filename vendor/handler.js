@@ -18,7 +18,7 @@ setInterval(() => {
   const order = createOrder('TheVendor'); 
   console.log('VENDOR: New pickup request', order);
   eventPool.emit('pickup', order);
-}, 5000);
+}, 8000);
 
 const handleDelivery = (payload) => {
   console.log(`VENDOR: Thanks for delivering the order: ${payload.orderId}`);
