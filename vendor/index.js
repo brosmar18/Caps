@@ -1,3 +1,6 @@
 'use strict';
 
-require('./handler'); 
+const { startOrderProcess } = require('./handler');
+
+
+startOrderProcess();

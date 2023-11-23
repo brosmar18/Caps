@@ -14,12 +14,14 @@ function createOrder(storeName) {
   };
 }
 
-// Pick Up request
-setInterval(() => {
-  const order = createOrder('TheVendor'); 
-  console.log('VENDOR: New pickup request', order);
-  eventPool.emit('pickup', order);
-}, 5000);
+// Function to start the order creation process
+function startOrderProcess() {
+  setInterval(() => {
+    const order = createOrder('TheVendor');
+    console.log('VENDOR: New pickup request', order);
+    eventPool.emit('pickup', order);
+  }, 5000);
+}
 
 // Delivery response
 const handleDelivery = (payload) => {
@@ -28,4 +30,4 @@ const handleDelivery = (payload) => {
 
 eventPool.on('delivered', handleDelivery);
 
-module.exports = { handleDelivery };
+module.exports = { handleDelivery, startOrderProcess };
