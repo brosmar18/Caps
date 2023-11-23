@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chance": "^1.1.11",
     "eslint": "^8.29.0",
     "express": "^4.17.1",
     "jest": "^26.6.3"
