@@ -3,15 +3,18 @@
 const io = require('socket.io-client');
 require('dotenv').config();
 const PORT = process.env.PORT || 5002;
-const socket = io(`http://localhost:${PORT}/caps`)
+const socket = io(`http://localhost:${PORT}/caps`);
 
 socket.on('connect', () => {
+  console.log('Driver connected to the CAPS server');
+
   socket.on('pickup', (payload) => {
-    console.log(`DRIVER: Picked up ${payload.orderId}`);
+    console.log(`DRIVER: Picked up order ID ${payload.orderId}`);
+    console.log(`DRIVER: Order ID ${payload.orderId} is now In-Transit`);
     socket.emit('in-transit', payload);
 
     setTimeout(() => {
-      console.log(`DRIVER: Delivered ${payload.orderId}`);
+      console.log(`DRIVER: Delivered order ID ${payload.orderId}`);
       socket.emit('delivered', payload);
     }, 4000);
   });
