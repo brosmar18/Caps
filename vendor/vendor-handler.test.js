@@ -15,26 +15,31 @@ describe('Vendor Order Creation and Emission', () => {
     jest.clearAllMocks();
   });
 
-  it('should create and emit an order every 5 seconds', () => {
+  it('should create and emit an order every 30 seconds', () => {
     const consoleSpy = jest.spyOn(console, 'log');
-
     
+
     startOrderProcess();
+  
 
+    jest.advanceTimersByTime(32000); 
     
-    jest.advanceTimersByTime(5000);
 
-    
+    expect(consoleSpy).toHaveBeenCalled();
+
+    expect(eventPool.emit).toHaveBeenCalledWith('pickup', expect.any(Object));
+  
+
+    jest.clearAllMocks();
+  
+
+    jest.advanceTimersByTime(32000);
+  
+
     expect(consoleSpy).toHaveBeenCalled();
     expect(eventPool.emit).toHaveBeenCalledWith('pickup', expect.any(Object));
-
-    
-    jest.advanceTimersByTime(5000);
-
-    
-    expect(consoleSpy).toHaveBeenCalledTimes(2);
-    expect(eventPool.emit).toHaveBeenCalledTimes(2);
   });
+  
 
   it('should log a thank you message on delivery', () => {
     const consoleSpy = jest.spyOn(console, 'log');

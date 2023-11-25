@@ -4,21 +4,26 @@ const eventPool = require('../eventPool');
 
 // Pickup event 
 function handlePickup(payload) {
-  console.log(`DRIVER: Picked up ${payload.orderId}`);
-  eventPool.emit('in-transit', payload);
+  setTimeout(() => {
+    console.log(`DRIVER: Picked up ${payload.orderId}`);
+    eventPool.emit('picked-up', payload);
+  }, 3000); // Delay before 'Picked up'
+
 
   // In-transit phase
   setTimeout(() => {
+    console.log(`DRIVER: In-transit ${payload.orderId}`);
     handleDelivered(payload); 
-  }, 3000); 
+  }, 10000); // Delay before 'In-transit'
 }
 
 // Delivered event
 function handleDelivered(payload) {
-  console.log(`DRIVER: Delivered ${payload.orderId}`);
-  eventPool.emit('delivered', payload);
+  setTimeout(() => {
+    console.log(`DRIVER: Delivered ${payload.orderId}`);
+    eventPool.emit('delivered', payload);
+  }, 5000); // Delay before 'Delivered'
 }
-
 eventPool.on('pickup', handlePickup);
 
 module.exports = {
