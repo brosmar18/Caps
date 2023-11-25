@@ -1,8 +1,13 @@
 'use strict';
 
+const io = require('socket.io-client');
 const Chance = require('chance');
 const chance = new Chance();
-const eventPool = require('../eventPool');
+
+require('dotenv').config();
+const PORT = process.env.PORT || 5002;
+const socket = io(`http://localhost:${PORT}/caps`)
+
 
 // Create Order
 function createOrder(storeName) {
@@ -14,22 +19,18 @@ function createOrder(storeName) {
   };
 }
 
-// Function to start the order creation process
-function startOrderProcess() {
+const storeName = '1-206-flowers';
+
+
+socket.on('connect', () => {
+  socket.emit('join', storeName);
   setInterval(() => {
-    const order = createOrder('TheVendor');
+    const order = createOrder(storeName);
     console.log('VENDOR: New pickup request', order);
-    setTimeout(() => {
-      eventPool.emit('pickup', order);
-    }, 2000); 
-  }, 30000); 
-}
+    socket.emit('pickup', order);
+  }, 5000);
 
-// Delivery response
-const handleDelivery = (payload) => {
-  console.log(`VENDOR: Thanks for delivering the order: ${payload.orderId}`);
-}
-
-eventPool.on('delivered', handleDelivery);
-
-module.exports = { handleDelivery, startOrderProcess };
+  socket.on('delivered', (payload) => {
+    console.log(`VENDOR: Thank you for delivering ${payload.orderId}`);
+  });
+});
