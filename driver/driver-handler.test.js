@@ -23,7 +23,7 @@ describe('Driver Event Handlers', () => {
     handlePickup(order);
 
     expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Picked up ${order.orderId}`);
-    expect(eventPool.emit).toHaveBeenCalledWith('in-transit', order);
+    expect(eventPool.emit).toHaveBeenCalledWith('picked-up', order);
 
     
     jest.advanceTimersByTime(3000);

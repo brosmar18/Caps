@@ -19,8 +19,10 @@ function startOrderProcess() {
   setInterval(() => {
     const order = createOrder('TheVendor');
     console.log('VENDOR: New pickup request', order);
-    eventPool.emit('pickup', order);
-  }, 5000);
+    setTimeout(() => {
+      eventPool.emit('pickup', order);
+    }, 2000); 
+  }, 30000); 
 }
 
 // Delivery response

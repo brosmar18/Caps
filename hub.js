@@ -12,7 +12,7 @@ const logEvent = (eventType, payload) => {
 }
 
 // Bind the logEvent function to multiple events
-eventPool.on('pickup', payload => logEvent('pickup', payload));
+eventPool.on('picked-up', payload => logEvent('picked-up', payload));
 eventPool.on('in-transit', payload => logEvent('in-transit', payload));
 eventPool.on('delivered', payload => logEvent('delivered', payload));
 
