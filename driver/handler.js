@@ -1,32 +1,29 @@
 'use strict';
 
-const eventPool = require('../eventPool');
+const io = require('socket.io-client');
+require('dotenv').config();
+const PORT = process.env.PORT || 5002;
+const socket = io(`http://localhost:${PORT}/caps`);
 
-// Pickup event 
 function handlePickup(payload) {
-  setTimeout(() => {
-    console.log(`DRIVER: Picked up ${payload.orderId}`);
-    eventPool.emit('picked-up', payload);
-  }, 3000); // Delay before 'Picked up'
+  console.log(`DRIVER: Picked up order ID ${payload.orderId}`);
+  console.log(`DRIVER: Order ID ${payload.orderId} is now In-Transit`);
+  socket.emit('in-transit', payload);
 
-
-  // In-transit phase
   setTimeout(() => {
-    console.log(`DRIVER: In-transit ${payload.orderId}`);
-    handleDelivered(payload); 
-  }, 10000); // Delay before 'In-transit'
+    handleDelivered(payload);
+  }, 4000);
 }
 
-// Delivered event
 function handleDelivered(payload) {
-  setTimeout(() => {
-    console.log(`DRIVER: Delivered ${payload.orderId}`);
-    eventPool.emit('delivered', payload);
-  }, 5000); // Delay before 'Delivered'
+  console.log(`DRIVER: Delivered order ID ${payload.orderId}`);
+  socket.emit('delivered', payload);
 }
-eventPool.on('pickup', handlePickup);
 
-module.exports = {
-  handlePickup,
-  handleDelivered
-};
+socket.on('connect', () => {
+  console.log('Driver connected to the CAPS server');
+
+  socket.on('pickup', handlePickup);
+});
+
+module.exports = { handlePickup, handleDelivered };
