@@ -4,10 +4,9 @@
 
 ### Author: Bryan O. Garduno Gonzalez
 
-
 ### Problem Domain
 
-The CAPS (Courier, Airline, Parcel, and Shipment) system is designed as an event-driven application simulating a package delivery process. It represents the interaction between vendors and drivers in the package delivery lifecycle using a Node.js-based system. The application employs an event-driven architecture to manage package states (pickup, in-transit, and delivered) and facilitate real-time communication between vendors and drivers.
+The CAPS (Courier, Airline, Parcel, and Shipment) system, now in its Phase 2, has evolved into a networked, event-driven application simulating a package delivery process. The core functionality remains focused on managing package states (pickup, in-transit, and delivered) and facilitating real-time communication between vendors and drivers. In this phase, the application employs Socket.io to create a network event-driven system, enabling real-time, bi-directional communication between web clients and servers.
 
 ### Links and Resources
 
@@ -15,20 +14,15 @@ The CAPS (Courier, Airline, Parcel, and Shipment) system is designed as an event
 - Dev [Back-end server Dev Branch url]()
 - Main [back-end server main branch url]()
 
-
 ### Collaborators
 
-
-
 - **ChatGPT by OpenAI**: Used as a programming partner for brainstorming ideas, debugging code, formulating tests, and drafting documentation. ChatGPT's contributions were invaluable in enhancing the efficiency and quality of the development process.
-
 
 ### Setup
 
 #### `.env` requirements (where applicable)
 
-
-A .env file is included in local repository. A .env-sample file is uploaed to the remote repo so collaborators understand what environmental variables are being used. 
+A .env file is included in local repository. A .env-sample file is uploaded to the remote repo so collaborators understand what environmental variables are being used. 
 
 #### How to initialize/run your application (where applicable)
 
@@ -38,49 +32,42 @@ A .env file is included in local repository. A .env-sample file is uploaed to th
 
 ## Features
 
-- **Event-Driven Architecture**: The CAPS system leverages an event-driven model to simulate real-time interactions in the package delivery lifecycle. This approach allows for efficient and dynamic communication between different modules of the application.
+- **Networked Event-Driven Architecture**: Leveraging Socket.io, the CAPS system now supports real-time, networked communication. This upgrade allows for more dynamic and efficient interactions between vendors, drivers, and the server.
 
-- **Global Event Pool**: Implemented through `eventPool.js`, this module acts as the central hub for all events, enabling different parts of the application to communicate via event emissions.
+- **Socket.io Implementation**: The system utilizes Socket.io to manage connections on a namespace called 'caps', enabling seamless event handling and broadcasting to specific clients.
 
 - **Vendor Client Application**: 
-  - Automatic Order Generation: The vendor module, comprised of `vendor/handler.js` and `vendor/index.js`, simulates order creation at regular intervals using the Chance library to generate random order details.
-  - Event Emission: Upon generating an order, a 'pickup' event is emitted to the Global Event Pool with detailed order information.
-  - Delivery Acknowledgment: The vendor listens for 'delivered' events and logs a thank you message upon successful delivery.
+  - Enhanced Order Processing: Vendors emit 'pickup' events to the Socket.io server, which are then broadcast to drivers.
+  - Real-Time Delivery Confirmation: Vendors listen for 'delivered' events from drivers and acknowledge deliveries in real-time.
 
 - **Driver Client Application**: 
-  - Order Processing: In `driver/handler.js`, the driver module listens for 'pickup' events. Upon receiving an order, it emits an 'in-transit' event, simulates a delivery process, and then emits a 'delivered' event.
-  - Real-time Updates: The driver module logs updates at each stage of the delivery process, providing real-time feedback on the status of each order.
+  - Networked Order Handling: Drivers receive 'pickup' events from the Socket.io server and process orders by emitting 'in-transit' and 'delivered' events back to the server.
+  - Real-time Order Updates: Drivers continuously update the system about the order status, enhancing the tracking and management of deliveries.
 
-- **Robust Logging System**: Implemented in `hub.js`, the system logs all events with timestamps and payloads, offering transparency and traceability for all package movements within the system.
+- **Robust Logging System**: The server logs all events with timestamps and payload details, offering greater transparency and traceability of package movements.
 
-- **Unit Testing**: The application includes comprehensive unit tests for event handlers in both the vendor and driver modules, ensuring the reliability and integrity of the event handling logic.
-
-
-
-
+- **Unit Testing**: Comprehensive unit tests ensure the reliability and correctness of the Socket.io event handling and business logic in both vendor and driver modules.
 
 #### Tests
 
-The CAPS project includes a suite of unit tests to ensure the functionality and reliability of its event handlers and modules. The tests are divided into two main categories: Vendor Order Creation and Emission and Driver Event Handlers.
+The CAPS project, now integrated with Socket.io, includes updated unit tests to ensure the functionality and reliability of its networked event handlers.
 
-##### Vendor Order Creation and Emission
-This set of tests focuses on the functionality related to vendors alerting the system when they have a package to be picked up and receiving a thank you message on delivery.
+##### Vendor Event Handling
+Tests focus on vendor functionalities such as order creation, event emission to the server, and handling of real-time delivery confirmations.
 
-##### Driver Event Handlers
-These tests concentrate on the functionality of drivers being notified about package delivery and handling pickup and delivery events.
+##### Driver Event Handling
+These tests cover the driver's response to networked events, including the reception of order pickups, processing of deliveries, and communication of status updates to the server.
 
 ### Running the Tests:
 
-To run the tests for the CAPS project, use the following commands:
+To run the updated tests for the CAPS project with Socket.io integration, use the command:
 
 `npm test`
 
 ### Incomplete or Skipped Tests:
 
-All critical functionality of the CAPS project is covered by these tests, and there are no incomplete or skipped tests. The test suite provides comprehensive coverage of the specified features and requirements.
-
+All critical functionalities of the CAPS project are thoroughly tested. The test suite provides comprehensive coverage, ensuring the system operates reliably with its new networked event-driven architecture.
 
 #### UML
-
 
 ![Caps](assets/capsUML.png);
