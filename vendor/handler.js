@@ -5,7 +5,6 @@ const Chance = require('chance');
 const chance = new Chance();
 require('dotenv').config();
 const PORT = process.env.PORT || 5002;
-const socket = io(`http://localhost:${PORT}/caps`);
 const storeName = '1-206-flowers';
 
 function createOrder(storeName) {
@@ -17,24 +16,28 @@ function createOrder(storeName) {
   };
 }
 
-socket.on('connect', () => {
-  console.log(`Vendor connected to CAPS server as ${storeName}`);
-  socket.emit('join', storeName);
+function startVendorProcess() {
+  const socket = io(`http://localhost:${PORT}/caps`);
 
-  setInterval(() => {
-    const order = createOrder(storeName);
-    console.log(`VENDOR: New pickup request for order ID ${order.orderId}`);
-    socket.emit('pickup', order);
-  }, 5000);
+  socket.on('connect', () => {
+    console.log(`Vendor connected to CAPS server as ${storeName}`);
+    socket.emit('join', storeName);
 
-  socket.on('in-transit', (payload) => {
-    console.log(`VENDOR: Order ID ${payload.orderId} is In-Transit`);
+    setInterval(() => {
+      const order = createOrder(storeName);
+      console.log(`VENDOR: New pickup request for order ID ${order.orderId}`);
+      socket.emit('pickup', order);
+    }, 5000);
+
+    socket.on('in-transit', (payload) => {
+      console.log(`VENDOR: Order ID ${payload.orderId} is In-Transit`);
+    });
+
+    socket.on('delivered', (payload) => {
+      console.log(`VENDOR: Order ID ${payload.orderId} has been Delivered`);
+      console.log(`VENDOR: Thank you for delivering order ID ${payload.orderId}`);
+    });
   });
+}
 
-  socket.on('delivered', (payload) => {
-    console.log(`VENDOR: Order ID ${payload.orderId} has been Delivered`);
-    console.log(`VENDOR: Thank you for delivering order ID ${payload.orderId}`);
-  });
-});
-
-
+module.exports = { createOrder, startVendorProcess };
