@@ -1,4 +1,4 @@
-# LAB - Class 11
+# LAB - Class 13
 
 ## Project: Caps
 
@@ -6,7 +6,8 @@
 
 ### Problem Domain
 
-The CAPS (Courier, Airline, Parcel, and Shipment) system, now in its Phase 2, has evolved into a networked, event-driven application simulating a package delivery process. The core functionality remains focused on managing package states (pickup, in-transit, and delivered) and facilitating real-time communication between vendors and drivers. In this phase, the application employs Socket.io to create a network event-driven system, enabling real-time, bi-directional communication between web clients and servers.
+In Phase 3, CAPS (Courier, Airline, Parcel, and Shipment) evolves into a sophisticated, real-time package delivery management system. This phase introduces a robust queueing mechanism on the server side, ensuring every package event from pickup to delivery is reliably communicated to and acknowledged by vendors and drivers, even in their absence. With an emphasis on guaranteed delivery of notifications and the ability to catch up on missed messages, CAPS Phase 3 enhances the communication pipeline, ensuring vendors and drivers are always in sync with the delivery process.
+
 
 ### Links and Resources
 
@@ -32,31 +33,29 @@ A .env file is included in local repository. A .env-sample file is uploaded to t
 
 ## Features
 
-- **Networked Event-Driven Architecture**: Leveraging Socket.io, the CAPS system now supports real-time, networked communication. This upgrade allows for more dynamic and efficient interactions between vendors, drivers, and the server.
+- **Message Queue System**: CAPS now includes a server-side queueing mechanism, categorizing and storing events for each client. This feature ensures no event is lost and clients can retrieve missed messages.
+- **Reliable Notification Delivery**: Vendors and drivers receive real-time notifications for package events. In case they are offline, the system stores these notifications for later retrieval.
+- **Event Acknowledgement**: Clients send back an acknowledgement upon receiving a message, ensuring the server can safely remove the message from the queue.
+- **Catch-up Mechanism**: Both vendors and drivers can request all undelivered messages upon reconnecting, ensuring they are up-to-date with all events.
+- **Refined Event Handling**: The server's event handlers are now equipped to manage adding messages to queues and broadcasting them to the appropriate clients.
+- **Server-Side Tracking**: Every event and payload is tracked on the server side, adding an additional layer of reliability and traceability.
 
-- **Socket.io Implementation**: The system utilizes Socket.io to manage connections on a namespace called 'caps', enabling seamless event handling and broadcasting to specific clients.
 
-- **Vendor Client Application**: 
-  - Enhanced Order Processing: Vendors emit 'pickup' events to the Socket.io server, which are then broadcast to drivers.
-  - Real-Time Delivery Confirmation: Vendors listen for 'delivered' events from drivers and acknowledge deliveries in real-time.
+## Features
 
-- **Driver Client Application**: 
-  - Networked Order Handling: Drivers receive 'pickup' events from the Socket.io server and process orders by emitting 'in-transit' and 'delivered' events back to the server.
-  - Real-time Order Updates: Drivers continuously update the system about the order status, enhancing the tracking and management of deliveries.
+**STRETCH GOAL COMPLETED**
 
-- **Robust Logging System**: The server logs all events with timestamps and payload details, offering greater transparency and traceability of package movements.
+- **Message Queue System**: Introduces a server-side queue mechanism, ensuring that event notifications are managed and tracked efficiently, providing reliability in the communication process.
+- **Reliable Delivery of Notifications**: Both vendors and drivers receive real-time notifications for package events. The system retains these notifications for offline clients, ensuring no information is missed.
+- **Event Acknowledgement and Queue Management**: Clients acknowledge received messages, enabling the server to safely remove them from the queue, maintaining the integrity and relevance of the queue contents.
+- **Catch-up Mechanism for Missed Messages**: Clients can request all undelivered messages, ensuring they're always updated with the latest events.
+- **Enhanced Event Handling on Server**: Improved to manage adding messages to queues and broadcasting them efficiently to the appropriate clients.
+- **Server-Side Event Tracking**: Adds a layer of reliability with logging every event and payload, enhancing traceability.
+- **SocketClient Class Implementation (Stretch Goal)**: Abstracts socket.io-client functionality, with methods for connecting to the server, joining rooms, publishing events, and subscribing to them. This class enhances modularity and reusability across different client applications, allowing them to interact seamlessly with the server for event handling.
 
-- **Unit Testing**: Comprehensive unit tests ensure the reliability and correctness of the Socket.io event handling and business logic in both vendor and driver modules.
+These features collectively enhance the CAPS system, making it a robust, reliable, and real-time package delivery management platform.
 
-#### Tests
 
-The CAPS project, now integrated with Socket.io, includes updated unit tests to ensure the functionality and reliability of its networked event handlers.
-
-##### Vendor Event Handling
-Tests focus on vendor functionalities such as order creation, event emission to the server, and handling of real-time delivery confirmations.
-
-##### Driver Event Handling
-These tests cover the driver's response to networked events, including the reception of order pickups, processing of deliveries, and communication of status updates to the server.
 
 ### Running the Tests:
 
@@ -70,4 +69,4 @@ All critical functionalities of the CAPS project are thoroughly tested. The test
 
 #### UML
 
-![Caps](assets/capsUML.png);
+![Caps](assets/capsPhase3UML.png);
