@@ -22,6 +22,7 @@ function startVendorProcess() {
   socket.on('connect', () => {
     console.log(`Vendor connected to CAPS server as ${storeName}`);
     socket.emit('join', storeName);
+    socket.emit('getAll', { clientId: storeName, event: 'delivered' });
 
     setInterval(() => {
       const order = createOrder(storeName);
@@ -36,6 +37,8 @@ function startVendorProcess() {
     socket.on('delivered', (payload) => {
       console.log(`VENDOR: Order ID ${payload.orderId} has been Delivered`);
       console.log(`VENDOR: Thank you for delivering order ID ${payload.orderId}`);
+      console.log(`Confirming delivery of order ${payload.orderId}`);
+      socket.emit('received', { clientId: 'vendorId', event: 'delivered', MessageId: payload.orderId });
     });
   });
 }

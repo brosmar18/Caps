@@ -22,8 +22,9 @@ function handleDelivered(payload) {
 
 socket.on('connect', () => {
   console.log('Driver connected to the CAPS server');
-
+  socket.emit('getAll', { clientId: 'driver', event: 'pickup' });
   socket.on('pickup', handlePickup);
 });
+
 
 module.exports = { handlePickup, handleDelivered };

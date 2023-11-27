@@ -21,10 +21,10 @@ class Queue {
         return this.messages[clientId] ? this.messages[clientId][event] || [] : [];
     }
 
-    acknoledgeMessage(clientId, event, messageID) {
+    acknoledgeMessage(clientId, event, messageId) {
         if (this.messages[clientId] && this.messages[clientId][event]) {
             this.messages[clientId][event] = this.messages[clientId][event].filter(
-                (message) => message.id !== messageID
+                (message) => message.id !== messageId
             );
         }
     }
