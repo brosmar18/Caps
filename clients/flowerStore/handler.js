@@ -1,11 +1,12 @@
 'use strict';
 
-const io = require('socket.io-client');
 const Chance = require('chance');
 const chance = new Chance();
+const SocketClient = require('../../server/lib/SocketClient');
+const storeName = '1-206-flowers';
 require('dotenv').config();
 const PORT = process.env.PORT || 5002;
-const storeName = '1-206-flowers';
+const serverUrl = `http://localhost:${PORT}/caps`; 
 
 function createOrder() {
     return {
@@ -17,29 +18,23 @@ function createOrder() {
 }
 
 function startFlowerStoreProcess() {
-    const socket = io(`http://localhost:${PORT}/caps`);
+    const socketClient = new SocketClient(storeName, serverUrl);
 
-    socket.on('connect', () => {
-        console.log(`Flower store connected to CAPS as ${storeName}`);
-        socket.emit('join', storeName);
-        socket.emit('getAll', { clientId: storeName, event: 'delivered'});
-
-        setInterval(() => {
-            const order = createOrder();
-            console.log(`Flower Store: New pickup request for order ID: ${order.orderId}`);
-            socket.emit('pickup', order);
-        }, 5000);
-
-        socket.on('in-transit', (payload) => {
-            console.log(`Flower Store: Order ID ${payload.orderId} is In-Transit`);
-        });
-
-        socket.on('delivered', (payload) => {
-            console.log(`Flower Store: Order ID ${payload.orderId} has been Delivered`);
-            console.log(`Flower Store: Thank you for delivering order ID ${payload.orderId}`);
-            socket.emit('received', { clientId: storeName, event: 'delivered', messageId: payload.orderId});
-        });
+    socketClient.subscribe('in-transit', (payload) => {
+        console.log(`Flower Store: Order ID ${payload.orderId} is In-Transit`);
     });
+
+    socketClient.subscribe('delivered', (payload) => {
+        console.log(`Flower Store: Order ID ${payload.orderId} has been Delivered`);
+        console.log(`Flower Store: Thank you for delivering order ID ${payload.orderId}`);
+        socketClient.publish('received', { clientId: storeName, event: 'delivered', messageId: payload.orderId });
+    });
+
+    setInterval(() => {
+        const order = createOrder();
+        console.log(`Flower Store: New pickup request for order ID: ${order.orderId}`);
+        socketClient.publish('pickup', order);
+    }, 5000);
 }
 
 module.exports = { startFlowerStoreProcess };
