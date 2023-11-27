@@ -1,79 +1,63 @@
-'use strict';
-
-const { handlePickup, handleDelivered } = require('./handler');
-const io = require('socket.io-client');
-
 jest.mock('socket.io-client', () => {
-  const emit = jest.fn();
-  const on = jest.fn();
-
-  // Mock implementation of io function
-  const io = jest.fn().mockImplementation(() => ({
-    emit,
-    on,
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    close: jest.fn(),
-  }));
-
-  return io;
+  return jest.fn().mockImplementation(() => {
+    return {
+      emit: jest.fn(),
+      on: jest.fn(),
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+      close: jest.fn(),
+    };
+  });
 });
 
-jest.useFakeTimers();
+const { startDriverProcess } = require('./handler');
+const io = require('socket.io-client');
 
 describe('Driver Event Handlers', () => {
-  let socket;
+  let mockSocket;
+
   beforeEach(() => {
     io.mockClear();
-    socket = io();
+    mockSocket = { emit: jest.fn(), on: jest.fn() };
+    io.mockReturnValue(mockSocket);
+    jest.spyOn(console, 'log');
+    jest.useFakeTimers();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.useRealTimers();
+  });
 
-  it('should emit in-transit and log pickup message on handlePickup', () => {
-    const consoleSpy = jest.spyOn(console, 'log');
-    const order = { orderId: '1234' };
+  it('should handle pickup event and emit in-transit', () => {
+    startDriverProcess();
 
-    handlePickup(order);
+    const testPayload = { orderId: 'test-order' };
+    const pickupCallback = mockSocket.on.mock.calls.find(call => call[0] === 'pickup')[1];
+    pickupCallback(testPayload);
 
-    // Advance timers for the setTimeout in handlePickup
+    expect(console.log).toHaveBeenCalledWith(`DRIVER: Picked up order ID ${testPayload.orderId}`);
+    expect(console.log).toHaveBeenCalledWith(`DRIVER: Order ID ${testPayload.orderId} is now In-Transit`);
+    expect(mockSocket.emit).toHaveBeenCalledWith('in-transit', testPayload);
+
+    jest.runAllTimers();
+    expect(mockSocket.emit).toHaveBeenCalledWith('delivered', testPayload);
+  });
+
+  it('should handle delivered event', () => {
+    startDriverProcess();
+
+
+    const testPayload = { orderId: 'test-order' };
+    const pickupCallback = mockSocket.on.mock.calls.find(call => call[0] === 'pickup')[1];
+    pickupCallback(testPayload);
+
+
     jest.runAllTimers();
 
-    expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Picked up order ID ${order.orderId}`);
-    expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Order ID ${order.orderId} is now In-Transit`);
-    expect(socket.emit).toHaveBeenCalledWith('in-transit', order);
 
-    // Additional check for the 'delivered' emit after the timeout
-    expect(socket.emit).toHaveBeenCalledWith('delivered', order);
+    expect(console.log).toHaveBeenCalledWith(`DRIVER: Delivered order ID ${testPayload.orderId}`);
+    expect(mockSocket.emit).toHaveBeenCalledWith('delivered', testPayload);
   });
 
-  it('should emit delivered and log delivery message on handleDelivered', () => {
-    const consoleSpy = jest.spyOn(console, 'log');
-    const order = { orderId: '5678' };
-
-    handleDelivered(order);
-
-    expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Delivered order ID ${order.orderId}`);
-    expect(socket.emit).toHaveBeenCalledWith('delivered', order);
-  });
-
-  it('should handle socket connect and pickup events', () => {
-    const consoleSpy = jest.spyOn(console, 'log');
-    const order = { orderId: 'connect-test' };
-
-    // Manually trigger the 'connect' event
-    const connectCallback = socket.on.mock.calls.find(call => call[0] === 'connect')[1];
-    connectCallback();
-
-    // Check if 'Driver connected to the CAPS server' is logged
-    expect(consoleSpy).toHaveBeenCalledWith('Driver connected to the CAPS server');
-
-    // Manually trigger the 'pickup' event
-    const pickupCallback = socket.on.mock.calls.find(call => call[0] === 'pickup')[1];
-    pickupCallback(order);
-
-    // Verify that the pickup handler is called
-    expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Picked up order ID ${order.orderId}`);
-    expect(consoleSpy).toHaveBeenCalledWith(`DRIVER: Order ID ${order.orderId} is now In-Transit`);
-    expect(socket.emit).toHaveBeenCalledWith('in-transit', order);
-  });
 });

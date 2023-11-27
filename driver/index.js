@@ -1,3 +1,3 @@
-'use strict';
+const { startDriverProcess } = require('./handler');
 
-require('./handler');
+startDriverProcess();

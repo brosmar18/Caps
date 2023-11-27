@@ -1,29 +1,36 @@
 'use strict';
-
-const io = require('socket.io-client');
 require('dotenv').config();
+const SocketClient = require('../server/lib/SocketClient');
+
+const clientId = 'driver';
 const PORT = process.env.PORT || 5002;
-const socket = io(`http://localhost:${PORT}/caps`);
+const serverUrl = `http://localhost:${PORT}/caps`;
 
 function handlePickup(payload) {
   console.log(`DRIVER: Picked up order ID ${payload.orderId}`);
   console.log(`DRIVER: Order ID ${payload.orderId} is now In-Transit`);
-  socket.emit('in-transit', payload);
+  this.publish('in-transit', payload);
 
   setTimeout(() => {
-    handleDelivered(payload);
+    this.handleDelivered(payload);
   }, 4000);
 }
 
 function handleDelivered(payload) {
   console.log(`DRIVER: Delivered order ID ${payload.orderId}`);
-  socket.emit('delivered', payload);
+  this.publish('delivered', payload);
 }
 
-socket.on('connect', () => {
-  console.log('Driver connected to the CAPS server');
+function startDriverProcess() {
+  const socketClient = new SocketClient(clientId, serverUrl);
 
-  socket.on('pickup', handlePickup);
-});
+  // Binding this context to handlePickup and handleDelivered
+  socketClient.handlePickup = handlePickup.bind(socketClient);
+  socketClient.handleDelivered = handleDelivered.bind(socketClient);
 
-module.exports = { handlePickup, handleDelivered };
+  socketClient.subscribe('pickup', socketClient.handlePickup);
+  
+  socketClient.socket.emit('getAll', { clientId: clientId, event: 'pickup' });
+}
+
+module.exports = { startDriverProcess };
